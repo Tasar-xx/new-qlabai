@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { fadeIn, staggerContainer, zoomIn } from "@/lib/animation";
-import { Camera, Film, Pencil, Volume2, Lightbulb, Wand2, Map, Palette, Shirt, Clapperboard, Users, LayoutGrid, Sparkles, FlipVertical, Languages } from "lucide-react";
+import { Camera, Film, Pencil, Volume2, Lightbulb, Wand2, Map, Palette, ShirtFolded, Clapperboard, Users, LayoutGrid, SparkleIcon, LucideFlipVertical, LanguagesIcon } from "lucide-react";
 
 // Combined tools data with icons and more details
 const toolsSections = [
@@ -52,7 +52,7 @@ const toolsSections = [
     category: "Pre-Production",
     title: "Concept Art",
     description: "Rapidly generate concept art versions of the director's vision.",
-    icon: <Sparkles className="w-20 h-20 text-primary" />,
+    icon: <SparkleIcon className="w-20 h-20 text-primary" />,
     longDescription: "Describe your vision and watch as our AI transforms it into professional concept art. Iterate quickly through variations to find the perfect visual style for your film.",
     features: [
       "Text-to-image generation",
@@ -66,7 +66,7 @@ const toolsSections = [
     category: "Pre-Production",
     title: "Costume Design",
     description: "Test hundreds of costume variations for characters in different scenes.",
-    icon: <Shirt className="w-20 h-20 text-primary" />,
+    icon: <ShirtFolded className="w-20 h-20 text-primary" />,
     longDescription: "Visualize your characters in different costumes before making production decisions. The AI considers historical accuracy, character personality, and scene context.",
     features: [
       "Character-specific recommendations",
@@ -192,7 +192,7 @@ const toolsSections = [
     category: "Post-Production",
     title: "Dubbing & Localization",
     description: "Create seamless dubbing for international releases with perfect lip sync.",
-    icon: <Languages className="w-20 h-20 text-primary" />,
+    icon: <LanguagesIcon className="w-20 h-20 text-primary" />,
     longDescription: "Localize your film for international audiences with AI-powered dubbing that matches lip movements. Preserve performance nuances across languages.",
     features: [
       "Multi-language support",
@@ -206,7 +206,7 @@ const toolsSections = [
     category: "Post-Production",
     title: "Physics Engine AI",
     description: "Create realistic physics-based VFX elements with minimal technical knowledge.",
-    icon: <FlipVertical className="w-20 h-20 text-primary" />,
+    icon: <LucideFlipVertical className="w-20 h-20 text-primary" />,
     longDescription: "Generate realistic visual effects like explosions, water, fire, and destruction without complex simulations. Our AI handles the physics while you focus on the creative vision.",
     features: [
       "Realistic elemental effects",
@@ -261,18 +261,16 @@ export default function ToolsSection() {
 
   const currentTool = toolsSections[activeToolIndex];
 
-  // Create a callback ref that works with both refs
-  const combinedRef = (el: HTMLDivElement | null) => {
-    // Update the section ref
-    sectionRef.current = el;
-  };
-
   return (
     <section
       id="tools"
       ref={(el) => {
-        combinedRef(el);
-        if (typeof ref === 'function') ref(el);
+        if (ref.current === null && el !== null) {
+          ref.current = el;
+        }
+        if (sectionRef.current === null && el !== null) {
+          sectionRef.current = el;
+        }
       }}
       className="min-h-screen py-24 bg-gradient-to-b from-black/90 to-black relative snap-start"
     >

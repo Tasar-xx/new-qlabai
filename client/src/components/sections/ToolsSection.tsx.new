@@ -263,17 +263,19 @@ export default function ToolsSection() {
 
   // Create a callback ref that works with both refs
   const combinedRef = (el: HTMLDivElement | null) => {
-    // Update the section ref
-    sectionRef.current = el;
+    if (el) {
+      // Use the callback version to avoid the read-only error
+      if (ref && typeof ref === 'function') {
+        ref(el);
+      }
+      sectionRef.current = el;
+    }
   };
 
   return (
     <section
       id="tools"
-      ref={(el) => {
-        combinedRef(el);
-        if (typeof ref === 'function') ref(el);
-      }}
+      ref={combinedRef}
       className="min-h-screen py-24 bg-gradient-to-b from-black/90 to-black relative snap-start"
     >
       <div className="container mx-auto px-6">
