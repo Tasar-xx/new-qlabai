@@ -292,7 +292,7 @@ export default function FeaturesSection() {
           {/* Feature Display */}
           <div 
             ref={featuresContainerRef}
-            className="relative h-[600px] mx-auto overflow-visible mb-20">
+            className="relative h-[700px] mx-auto overflow-visible mb-20">
             {features.map((feature, index) => {
               // Calculate position and z-index based on distance from active index
               const distance = Math.abs(index - activeFeatureIndex);
@@ -339,7 +339,7 @@ export default function FeaturesSection() {
                     duration: 0.5,
                     ease: "easeInOut"
                   }}
-                  className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 h-[600px] overflow-y-auto`}
+                  className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-7xl left-0 right-0 mx-auto top-0 h-[700px] overflow-y-auto`}
                   style={{ 
                     transformOrigin: index < activeFeatureIndex ? 'left center' : 'right center',
                     pointerEvents: isPointerEventsNone ? 'none' : 'auto',
@@ -362,7 +362,7 @@ export default function FeaturesSection() {
                     }
                   }}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start h-full px-4">
                     <div>
                       <div className="text-primary mb-6 bg-black/30 p-6 inline-block rounded-2xl">
                         {feature.icon}
@@ -400,7 +400,7 @@ export default function FeaturesSection() {
                       )}
                     </div>
                     
-                    <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden w-[120%] mx-auto">
+                    <div className="bg-black/40 rounded-2xl flex items-center justify-center p-4 border border-white/5 overflow-hidden w-full mx-auto mt-8 md:mt-12 h-[320px]">
                       {index === activeFeatureIndex ? (
                         <video 
                           src={featureVideo} 
