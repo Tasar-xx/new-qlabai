@@ -12,6 +12,9 @@ import feature4Img from '@/assets/features/feature-4.png';
 import feature5Img from '@/assets/features/feature-5.png';
 import feature6Img from '@/assets/features/feature-6.png';
 
+// Import feature video
+import featureVideo from '@/assets/videos/feature-video.mp4';
+
 // Define feature interface
 interface Feature {
   icon: ReactNode;
@@ -397,13 +400,25 @@ export default function FeaturesSection() {
                       )}
                     </div>
                     
-                    <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden">
-                      <img 
-                        src={feature.image} 
-                        alt={`Demonstration of ${feature.title} feature`}
-                        className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                        style={{ filter: feature.filter }}
-                      />
+                    <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden w-[120%] mx-auto">
+                      {index === activeFeatureIndex ? (
+                        <video 
+                          src={featureVideo} 
+                          autoPlay 
+                          loop 
+                          muted 
+                          playsInline
+                          className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                          style={{ filter: feature.filter }}
+                        />
+                      ) : (
+                        <img 
+                          src={feature.image} 
+                          alt={`Demonstration of ${feature.title} feature`}
+                          className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                          style={{ filter: feature.filter }}
+                        />
+                      )}
                     </div>
                   </div>
                 </motion.div>
