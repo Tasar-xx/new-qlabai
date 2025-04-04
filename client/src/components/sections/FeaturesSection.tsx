@@ -244,7 +244,6 @@ export default function FeaturesSection() {
                     muted 
                     playsInline
                     className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                    style={{ filter: feature.filter }}
                   />
                 </div>
               </div>
