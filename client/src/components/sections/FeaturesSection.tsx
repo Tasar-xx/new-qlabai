@@ -355,6 +355,7 @@ export default function FeaturesSection() {
                     pointerEvents: isPointerEventsNone ? 'none' : 'auto',
                     cursor: index !== activeFeatureIndex ? 'pointer' : 'default',
                     backgroundColor: `rgba(0, 0, 0, ${index === activeFeatureIndex ? 0.7 : 0.4})`,
+                    backdropFilter: index !== activeFeatureIndex ? 'blur(8px)' : 'none',
                   }}
                   onClick={() => {
                     if (index !== activeFeatureIndex) {
@@ -381,25 +382,27 @@ export default function FeaturesSection() {
                       <h3 className="text-4xl font-bold mb-3">{feature.title}</h3>
                       <p className="text-primary text-xl mb-6">{feature.description}</p>
                       
-                      {/* Only show detailed content for active feature */}
-                      {index === activeFeatureIndex && (
-                        <>
-                          <p className="text-lg text-gray-300 mb-8">{feature.longDescription}</p>
-                          
-                          <div className="space-y-3 mb-8">
-                            <h4 className="text-xl font-semibold">Key Features:</h4>
-                            <ul className="space-y-2">
-                              {feature.features.map((featureItem, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <div className="mr-2 mt-1 bg-primary/20 p-1 rounded-full">
-                                    <ArrowRight className="h-3 w-3 text-primary" />
-                                  </div>
-                                  <span>{featureItem}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          
+                      {/* Show detailed content for all features with different styles */}
+                      <div className={index !== activeFeatureIndex ? "opacity-60" : ""}>
+                        <p className={`text-lg text-gray-300 mb-8 ${index !== activeFeatureIndex ? "line-clamp-2" : ""}`}>
+                          {feature.longDescription}
+                        </p>
+                        
+                        <div className="space-y-3 mb-8">
+                          <h4 className="text-xl font-semibold">Key Features:</h4>
+                          <ul className={`space-y-2 ${index !== activeFeatureIndex ? "line-clamp-3" : ""}`}>
+                            {feature.features.map((featureItem, idx) => (
+                              <li key={idx} className="flex items-start">
+                                <div className="mr-2 mt-1 bg-primary/20 p-1 rounded-full">
+                                  <ArrowRight className="h-3 w-3 text-primary" />
+                                </div>
+                                <span>{featureItem}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        {index === activeFeatureIndex && (
                           <Button
                             variant="default"
                             size="lg"
@@ -407,11 +410,12 @@ export default function FeaturesSection() {
                           >
                             Explore {feature.title}
                           </Button>
-                        </>
-                      )}
+                        )}
+                      </div>
                     </div>
                     
                     <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden w-[120%] mx-auto">
+                      {/* Video display logic */}
                       {index === activeFeatureIndex && videoPlaceholders[index] ? (
                         <video 
                           src={videoPlaceholders[index]} 
@@ -424,12 +428,18 @@ export default function FeaturesSection() {
                         />
                       ) : (
                         <div className="w-full h-full rounded-xl overflow-hidden relative">
+                          {/* Always show the feature's image content */}
                           <img 
                             src={feature.image} 
                             alt={`Demonstration of ${feature.title} feature`}
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                            style={{ filter: feature.filter }}
+                            style={{ 
+                              filter: feature.filter,
+                              opacity: index === activeFeatureIndex ? 1 : 0.8
+                            }}
                           />
+                          
+                          {/* Show placeholder message only for active tabs that should have videos */}
                           {index === activeFeatureIndex && !videoPlaceholders[index] && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <p className="text-white/80 text-sm font-medium">
