@@ -167,8 +167,30 @@ export default function FeaturesSection() {
     };
   }, []);
 
-  // Handle wheel events for horizontal scrolling
+  // Touch tracking variables
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check for mobile device
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Handle wheel events for horizontal scrolling and touch events for mobile
+  useEffect(() => {
+    // Minimum swipe distance to trigger change
+    const MIN_SWIPE_DISTANCE = 50;
+    
     const handleWheel = (e: WheelEvent) => {
       if (!featuresContainerRef.current || isScrolling) return;
       
@@ -188,6 +210,50 @@ export default function FeaturesSection() {
           setTimeout(() => setIsScrolling(false), 500);
         }
       }
+    };
+    
+    // Touch event handlers
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!featuresContainerRef.current || isScrolling) return;
+      
+      setTouchStartX(e.touches[0].clientX);
+      setTouchEndX(null);
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStartX) return;
+      
+      setTouchEndX(e.touches[0].clientX);
+    };
+    
+    const handleTouchEnd = () => {
+      if (!touchStartX || !touchEndX || isScrolling) return;
+      
+      const distance = touchStartX - touchEndX;
+      const isLeftSwipe = distance > MIN_SWIPE_DISTANCE;
+      const isRightSwipe = distance < -MIN_SWIPE_DISTANCE;
+      
+      if (isLeftSwipe) {
+        // Swipe left - go to next feature
+        const newIndex = Math.min(features.length - 1, activeFeatureIndex + 1);
+        if (newIndex !== activeFeatureIndex) {
+          setIsScrolling(true);
+          setActiveFeatureIndex(newIndex);
+          setTimeout(() => setIsScrolling(false), 500);
+        }
+      } else if (isRightSwipe) {
+        // Swipe right - go to previous feature
+        const newIndex = Math.max(0, activeFeatureIndex - 1);
+        if (newIndex !== activeFeatureIndex) {
+          setIsScrolling(true);
+          setActiveFeatureIndex(newIndex);
+          setTimeout(() => setIsScrolling(false), 500);
+        }
+      }
+      
+      // Reset touch values
+      setTouchStartX(null);
+      setTouchEndX(null);
     };
     
     // Add keyboard navigation
@@ -228,37 +294,60 @@ export default function FeaturesSection() {
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
     
+    // Touch event listeners (passive: true is fine for touch events)
+    if (featuresContainerRef.current) {
+      featuresContainerRef.current.addEventListener('touchstart', handleTouchStart, { passive: true });
+      featuresContainerRef.current.addEventListener('touchmove', handleTouchMove, { passive: true });
+      featuresContainerRef.current.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
+    
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
+      
+      if (featuresContainerRef.current) {
+        featuresContainerRef.current.removeEventListener('touchstart', handleTouchStart);
+        featuresContainerRef.current.removeEventListener('touchmove', handleTouchMove);
+        featuresContainerRef.current.removeEventListener('touchend', handleTouchEnd);
+      }
     };
-  }, [activeFeatureIndex, isScrolling]);
+  }, [activeFeatureIndex, isScrolling, touchStartX, touchEndX]);
 
   return (
     <section
       id="features"
       ref={sectionRef}
-      className="bg-gradient-to-b from-black to-black/90 relative py-24"
+      className="bg-gradient-to-b from-black to-black/90 relative py-16 md:py-24"
     >
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial="hidden"
           animate={isVisible ? "visible" : "hidden"}
           variants={fadeIn()}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">
             Revolutionize Your Production
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
             Comprehensive AI tools to enhance and augment every aspect of your filmmaking process.
           </p>
         </motion.div>
 
+        {/* Mobile swipe instructions */}
+        {isMobile && (
+          <div className="text-center mb-4 text-gray-400 text-sm flex items-center justify-center">
+            <ArrowRight className="h-4 w-4 mr-1" />
+            <span>Swipe left or right to navigate features</span>
+            <ArrowRight className="h-4 w-4 ml-1 transform rotate-180" />
+          </div>
+        )}
+        
         {/* Floating features with horizontal scroll */}
         <div 
           ref={featuresContainerRef}
-          className="relative h-[700px] mx-auto overflow-visible mb-16"
+          className="relative mx-auto overflow-visible mb-8 md:mb-16"
+          style={{ height: isMobile ? '650px' : '700px' }}
         >
           {features.map((feature, index) => {
             // Calculate position and z-index based on distance from active index
@@ -271,23 +360,47 @@ export default function FeaturesSection() {
             let opacity = 1;
             let isPointerEventsNone = false;
             
-            if (index < activeFeatureIndex) {
-              // Left side cards
-              xPosition = `-${20 + (distance - 1) * 5}%`;
-              scale = 1 - 0.07 * distance;
-              opacity = 1 - 0.2 * distance;
-              if (distance > 2) {
-                opacity = 0;
-                isPointerEventsNone = true;
+            // Different positioning for mobile vs desktop
+            if (isMobile) {
+              if (index < activeFeatureIndex) {
+                // Left side cards (tighter stacking on mobile)
+                xPosition = `-${30 + (distance - 1) * 10}%`;
+                scale = 1 - 0.1 * distance;
+                opacity = 1 - 0.3 * distance;
+                if (distance > 1) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
+              } else if (index > activeFeatureIndex) {
+                // Right side cards (tighter stacking on mobile)
+                xPosition = `${30 + (distance - 1) * 10}%`;
+                scale = 1 - 0.1 * distance;
+                opacity = 1 - 0.3 * distance;
+                if (distance > 1) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
               }
-            } else if (index > activeFeatureIndex) {
-              // Right side cards
-              xPosition = `${20 + (distance - 1) * 5}%`;
-              scale = 1 - 0.07 * distance;
-              opacity = 1 - 0.2 * distance;
-              if (distance > 2) {
-                opacity = 0;
-                isPointerEventsNone = true;
+            } else {
+              // Desktop positioning
+              if (index < activeFeatureIndex) {
+                // Left side cards
+                xPosition = `-${20 + (distance - 1) * 5}%`;
+                scale = 1 - 0.07 * distance;
+                opacity = 1 - 0.2 * distance;
+                if (distance > 2) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
+              } else if (index > activeFeatureIndex) {
+                // Right side cards
+                xPosition = `${20 + (distance - 1) * 5}%`;
+                scale = 1 - 0.07 * distance;
+                opacity = 1 - 0.2 * distance;
+                if (distance > 2) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
               }
             }
             
@@ -306,11 +419,12 @@ export default function FeaturesSection() {
                   duration: 0.5,
                   ease: "easeInOut"
                 }}
-                className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 h-[700px]`}
+                className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-4 sm:p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 overflow-y-auto`}
                 style={{ 
                   transformOrigin: index < activeFeatureIndex ? 'left center' : 'right center',
                   pointerEvents: isPointerEventsNone ? 'none' : 'auto',
-                  cursor: index !== activeFeatureIndex ? 'pointer' : 'default'
+                  cursor: index !== activeFeatureIndex ? 'pointer' : 'default',
+                  height: isMobile ? '650px' : '700px'
                 }}
                 onClick={() => {
                   if (index !== activeFeatureIndex) {
@@ -329,27 +443,27 @@ export default function FeaturesSection() {
                   }
                 }}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start h-full px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start h-full px-2 md:px-4">
                   <div>
-                    <div className="text-primary mb-6 bg-black/30 p-6 inline-block rounded-2xl">
+                    <div className="text-primary mb-4 md:mb-6 bg-black/30 p-4 md:p-6 inline-block rounded-2xl">
                       {feature.icon}
                     </div>
-                    <h3 className="text-4xl font-bold mb-3">{feature.title}</h3>
-                    <p className="text-primary text-xl mb-6">{feature.description}</p>
+                    <h3 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3">{feature.title}</h3>
+                    <p className="text-primary text-lg md:text-xl mb-4 md:mb-6">{feature.description}</p>
                     
                     {index === activeFeatureIndex && (
                       <>
-                        <p className="text-lg text-gray-300 mb-8">{feature.longDescription}</p>
+                        <p className="text-base md:text-lg text-gray-300 mb-4 md:mb-8">{feature.longDescription}</p>
                         
-                        <div className="space-y-3 mb-8">
-                          <h4 className="text-xl font-semibold">Key Features:</h4>
+                        <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                          <h4 className="text-lg md:text-xl font-semibold">Key Features:</h4>
                           <ul className="space-y-2">
                             {feature.features.map((featureItem, idx) => (
                               <li key={idx} className="flex items-start">
                                 <div className="mr-2 mt-1 bg-primary/20 p-1 rounded-full">
                                   <ArrowRight className="h-3 w-3 text-primary" />
                                 </div>
-                                <span>{featureItem}</span>
+                                <span className="text-sm md:text-base">{featureItem}</span>
                               </li>
                             ))}
                           </ul>
@@ -357,8 +471,8 @@ export default function FeaturesSection() {
                         
                         <Button
                           variant="default"
-                          size="lg"
-                          className="rounded-full bg-primary text-black hover:bg-primary/90"
+                          size={isMobile ? "default" : "lg"}
+                          className="rounded-full bg-primary text-black hover:bg-primary/90 text-sm md:text-base"
                         >
                           Explore {feature.title}
                         </Button>
@@ -366,7 +480,7 @@ export default function FeaturesSection() {
                     )}
                   </div>
                   
-                  <div className="bg-black/40 rounded-2xl flex items-center justify-center p-4 border border-white/5 overflow-hidden w-full mx-auto mt-8 md:mt-0 h-[320px]">
+                  <div className="bg-black/40 rounded-2xl flex items-center justify-center p-2 md:p-4 border border-white/5 overflow-hidden w-full mx-auto mt-4 md:mt-0 h-[200px] md:h-[320px]">
                     <video 
                       src={
                         index === 0 ? featureVideo1 :
@@ -390,7 +504,7 @@ export default function FeaturesSection() {
         </div>
         
         {/* Feature Navigation Dots */}
-        <div className="flex justify-center mb-16 space-x-2">
+        <div className="flex justify-center mb-8 md:mb-16 space-x-3 md:space-x-2">
           {features.map((feature, index) => (
             <button
               key={index}
@@ -398,26 +512,37 @@ export default function FeaturesSection() {
                 setActiveFeatureIndex(index);
               }}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === activeFeatureIndex ? 'bg-primary scale-125' : 'bg-gray-600 hover:bg-gray-400'
+                index === activeFeatureIndex ? 'bg-primary scale-150' : 'bg-gray-600 hover:bg-gray-400'
               }`}
+              style={{ 
+                padding: isMobile ? '8px' : '0',
+                margin: isMobile ? '0 5px' : '0'
+              }}
               aria-label={`View ${feature.title}`}
             />
           ))}
         </div>
         
+        {/* Mobile swipe indicator */}
+        {isMobile && (
+          <div className="flex justify-center items-center mb-12">
+            <div className={`w-12 h-1 rounded-full bg-gray-600 opacity-50 transition-all duration-500`} />
+          </div>
+        )}
+        
         <motion.div
           variants={fadeIn("up", 0.6)}
-          className="mt-16 text-center"
+          className="mt-8 md:mt-16 text-center"
         >
           <Button
             variant="outline"
-            size="lg"
-            className="rounded-full border-primary text-primary hover:bg-primary hover:text-white"
+            size={isMobile ? "default" : "lg"}
+            className="rounded-full border-primary text-primary hover:bg-primary hover:text-white text-sm md:text-base"
             asChild
           >
-            <a href="#tools">
+            <a href="#tools" className="px-4 py-2 flex items-center justify-center">
               View Advanced Tools
-              <ArrowDown className="ml-2 h-4 w-4" />
+              <ArrowDown className="ml-2 h-3 w-3 md:h-4 md:w-4" />
             </a>
           </Button>
         </motion.div>
