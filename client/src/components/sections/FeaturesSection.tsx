@@ -12,8 +12,14 @@ import feature4Img from '@/assets/features/feature-4.png';
 import feature5Img from '@/assets/features/feature-5.png';
 import feature6Img from '@/assets/features/feature-6.png';
 
-// Import feature video
-import featureVideo from '@/assets/videos/feature-video.mp4';
+// Import feature videos
+// Replacing the previous single video with multiple videos for each feature
+import featureVideo1 from '@/assets/videos/feature-video.mp4';
+import featureVideo2 from '@assets/freepik__a-closeup-shot-of-a-woman-with-braided-hair-standi__24609.mp4';
+import featureVideo3 from '@assets/freepik__camera-zooms-in-on-his-face-as-he-breathes-heavily__24616.mp4';
+import featureVideo4 from '@assets/freepik__horror-shot-head-turns-around-360-degree__24620.mp4';
+import featureVideo5 from '@assets/freepik__flies-through-the-city-at-insane-jet-speeds__25181.mp4';
+import featureVideo6 from '@assets/freepik__closeup-shot-a-man-stands-in-a-dimly-lit-bathroom-__24615.mp4';
 
 // Define feature interface
 interface Feature {
@@ -224,24 +230,22 @@ export default function FeaturesSection() {
                 </div>
                 
                 <div className="bg-black/40 rounded-2xl flex items-center justify-center p-4 border border-white/5 overflow-hidden w-full mx-auto mt-8 md:mt-0 h-[320px]">
-                  {index === 0 ? (
-                    <video 
-                      src={featureVideo} 
-                      autoPlay 
-                      loop 
-                      muted 
-                      playsInline
-                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                      style={{ filter: feature.filter }}
-                    />
-                  ) : (
-                    <img 
-                      src={feature.image} 
-                      alt={`Demonstration of ${feature.title} feature`}
-                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                      style={{ filter: feature.filter }}
-                    />
-                  )}
+                  <video 
+                    src={
+                      index === 0 ? featureVideo1 :
+                      index === 1 ? featureVideo2 :
+                      index === 2 ? featureVideo3 :
+                      index === 3 ? featureVideo4 :
+                      index === 4 ? featureVideo5 :
+                      featureVideo6
+                    } 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                    style={{ filter: feature.filter }}
+                  />
                 </div>
               </div>
             </motion.div>
