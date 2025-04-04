@@ -1,10 +1,29 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeIn, staggerContainer, zoomIn } from "@/lib/animation";
 import { Camera, Film, Pencil, Volume2, Lightbulb, Wand2, Map, Palette, Shirt, Clapperboard, Users, LayoutGrid, Sparkles, FlipVertical, Languages } from "lucide-react";
 
+// Import tool images
+import tool1Img from '@/assets/tools/tool-1.png';
+import tool2Img from '@/assets/tools/tool-2.png';
+import tool3Img from '@/assets/tools/tool-3.png';
+import tool4Img from '@/assets/tools/tool-4.png';
+import tool5Img from '@/assets/tools/tool-5.png';
+
+// Define tool interface
+interface Tool {
+  category: string;
+  title: string;
+  description: string;
+  icon: ReactNode;
+  longDescription: string;
+  features: string[];
+  image?: string;
+  filter?: string;
+}
+
 // Combined tools data with icons and more details
-const toolsSections = [
+const toolsSections: Tool[] = [
   {
     category: "Pre-Production",
     title: "Script Development",
@@ -17,7 +36,9 @@ const toolsSections = [
       "Dialogue enhancement",
       "Genre-specific recommendations",
       "Pacing optimization"
-    ]
+    ],
+    image: tool1Img,
+    filter: "brightness(1.1) contrast(1.1)"
   },
   {
     category: "Pre-Production",
@@ -31,7 +52,9 @@ const toolsSections = [
       "Camera framing suggestions",
       "Shot sequencing optimization",
       "Direct edits and adjustments"
-    ]
+    ],
+    image: tool2Img,
+    filter: "hue-rotate(40deg) saturate(1.2)"
   },
   {
     category: "Pre-Production",
@@ -45,7 +68,9 @@ const toolsSections = [
       "Lighting conditions simulation",
       "Location modification visualization",
       "Permit requirement insights"
-    ]
+    ],
+    image: tool3Img,
+    filter: "sepia(0.3) contrast(1.2)"
   },
   {
     category: "Pre-Production",
@@ -59,7 +84,9 @@ const toolsSections = [
       "Rapid iteration capability",
       "Asset library integration",
       "Visual reference management"
-    ]
+    ],
+    image: tool4Img,
+    filter: "hue-rotate(120deg) brightness(1.1)"
   },
   {
     category: "Pre-Production",
@@ -73,7 +100,9 @@ const toolsSections = [
       "Fabric and texture visualization",
       "Color palette harmonization",
       "Budget-conscious alternatives"
-    ]
+    ],
+    image: tool5Img,
+    filter: "contrast(1.2) saturate(1.1)"
   },
   {
     category: "Production",
@@ -355,6 +384,24 @@ export default function ToolsSection() {
                     <p className="text-primary">{currentTool.category}</p>
                   </div>
                 </div>
+
+                {/* Tool visualization with image if available */}
+                {currentTool.image && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-8 overflow-hidden rounded-lg relative group"
+                  >
+                    <img 
+                      src={currentTool.image} 
+                      alt={currentTool.title}
+                      className="w-full h-64 object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+                      style={{ filter: currentTool.filter || 'none' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                  </motion.div>
+                )}
                 
                 <p className="text-lg text-gray-300 mb-8">{currentTool.longDescription}</p>
                 

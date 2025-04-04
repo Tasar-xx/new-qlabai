@@ -2,10 +2,29 @@ import { motion } from "framer-motion";
 import { fadeIn, staggerContainer } from "@/lib/animation";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowRight, Camera, Code, Palette, MapPin, Film, User } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
-import featureShowcaseImg from '@/assets/feature-showcase.png';
+import { useRef, useState, useEffect, ReactNode } from "react";
 
-const features = [
+// Import all feature images
+import feature1Img from '@/assets/features/feature-1.png';
+import feature2Img from '@/assets/features/feature-2.png';
+import feature3Img from '@/assets/features/feature-3.png';
+import feature4Img from '@/assets/features/feature-4.png';
+import feature5Img from '@/assets/features/feature-5.png';
+import feature6Img from '@/assets/features/feature-6.png';
+
+// Define feature interface
+interface Feature {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  longDescription: string;
+  color: string;
+  image: string; 
+  filter: string;
+  features: string[];
+}
+
+const features: Feature[] = [
   {
     icon: <Code className="h-16 w-16" />,
     title: "Script Development",
@@ -13,6 +32,8 @@ const features = [
       "Modify character arcs or plot points and see how it affects the overall story. Your writer's room at your disposal.",
     longDescription: "Our AI-powered script development tool analyzes your screenplay to identify plot holes, character inconsistencies, and pacing issues. It can suggest alternative plot developments based on the emotional arcs you want to achieve. Get instant feedback on dialogue authenticity and character motivations, and explore different narrative directions with just a few clicks.",
     color: "from-blue-600/20 to-indigo-900/30",
+    image: feature1Img,
+    filter: "brightness(1.2) contrast(1.1)",
     features: [
       "Real-time plot analysis and suggestions",
       "Character consistency tracking",
@@ -28,6 +49,8 @@ const features = [
       "Rapidly generate concept art. Realize your vision, tweak and adjust in real-time to perfect every detail.",
     longDescription: "Transform your ideas into stunning visual concepts with our AI concept art generator. Input text descriptions or rough sketches and watch as your vision takes form. Adjust styles, lighting, perspective, and mood in real-time until you achieve the perfect look for your production. Explore multiple variations simultaneously to find the ideal direction.",
     color: "from-purple-600/20 to-pink-900/30",
+    image: feature2Img,
+    filter: "hue-rotate(40deg) saturate(1.2)",
     features: [
       "Text-to-image generation",
       "Style transfer and adaptation",
@@ -43,6 +66,8 @@ const features = [
       "Explore film styles, aspect ratios, film stocks, and color profiles. Test various options before committing.",
     longDescription: "Visualize your film's aesthetic before shooting a single frame. Our look development tool lets you experiment with different film stocks, aspect ratios, color grades, and lighting approaches. Upload reference images or describe the look you want to achieve, then watch as AI generates preview frames that show how your choices will impact the final product.",
     color: "from-amber-600/20 to-red-900/30",
+    image: feature3Img,
+    filter: "sepia(0.4) contrast(1.1)",
     features: [
       "Film stock simulation",
       "Color grading experiments",
@@ -58,6 +83,8 @@ const features = [
       "Try endless looks for characters. Map actors' faces to see how they fit the roles. Perfect every detail.",
     longDescription: "Design and refine characters with unprecedented flexibility. Experiment with different facial features, body types, clothing styles, and expressions. Preview how different actors would look in your roles by mapping their features onto character concepts. Ensure visual consistency across different scenes and lighting conditions.",
     color: "from-emerald-600/20 to-teal-900/30",
+    image: feature4Img,
+    filter: "hue-rotate(120deg) brightness(1.1)",
     features: [
       "Actor face mapping",
       "Costume design visualization", 
@@ -73,6 +100,8 @@ const features = [
       "Scout locations remotely in 3D. Fly through spaces and observe from any angle before visiting in person.",
     longDescription: "Transform location scouting with our advanced 3D environment creator. Browse thousands of real-world locations or build custom environments from scratch. Explore each location from any angle, at any time of day, and in any weather condition. Plan camera setups, identify potential issues, and make informed decisions before setting foot on location.",
     color: "from-cyan-600/20 to-blue-900/30",
+    image: feature5Img,
+    filter: "hue-rotate(180deg) saturate(0.8)",
     features: [
       "Virtual location exploration",
       "Time-of-day simulation", 
@@ -88,6 +117,8 @@ const features = [
       "Choose different lenses and picture profiles. Test looks from ARRI to BMPCC before filming begins.",
     longDescription: "Experience the impact of different camera systems and lenses before rental day. Our camera lensing tool simulates the unique characteristics of popular camera systems from ARRI to Blackmagic. Test different focal lengths, apertures, and picture profiles to find the perfect combination for your vision. Compare options side-by-side to make confident technical decisions.",
     color: "from-red-600/20 to-orange-900/30",
+    image: feature6Img,
+    filter: "hue-rotate(320deg) brightness(0.9) contrast(1.2)",
     features: [
       "Camera system comparison",
       "Lens characteristic simulation",
@@ -230,9 +261,10 @@ export default function FeaturesSection() {
               
               <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden">
                 <img 
-                  src={featureShowcaseImg} 
-                  alt="Feature demonstration of filmmaking in action"
+                  src={currentFeature.image} 
+                  alt={`Demonstration of ${currentFeature.title} feature`}
                   className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                  style={{ filter: currentFeature.filter }}
                 />
               </div>
             </div>
