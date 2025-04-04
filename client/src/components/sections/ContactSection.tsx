@@ -87,7 +87,7 @@ export default function ContactSection() {
                 Ready to Transform Your Filmmaking?
               </h2>
               <p className="text-xl text-gray-400">
-                Join the waitlist for early access to FilmCraftAI and revolutionize your production workflow.
+                Join the waitlist for early access to QlabAI and revolutionize your production workflow.
               </p>
             </div>
 
@@ -182,7 +182,7 @@ export default function ContactSection() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>How would you use FilmCraftAI?</FormLabel>
+                        <FormLabel>How would you use QlabAI?</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Tell us about your project..." 
@@ -216,12 +216,12 @@ export default function ContactSection() {
           <div className="text-center">
             <Mail className="h-8 w-8 text-primary mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">Email Us</h3>
-            <p className="text-gray-400">info@filmcraftai.com</p>
+            <p className="text-gray-400">info@qlabai.com</p>
           </div>
           <div className="text-center">
             <Users className="h-8 w-8 text-primary mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">Support</h3>
-            <p className="text-gray-400">support@filmcraftai.com</p>
+            <p className="text-gray-400">support@qlabai.com</p>
           </div>
           <div className="text-center">
             <MapPin className="h-8 w-8 text-primary mx-auto mb-4" />

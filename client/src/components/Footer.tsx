@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <h4 className="font-bold text-lg mb-4">FilmCraftAI</h4>
+            <h4 className="font-bold text-lg mb-4">QlabAI</h4>
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Our Team</a></li>
@@ -46,11 +46,11 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <Link href="/" className="text-2xl font-bold">
-              FilmCraft<span className="text-primary">AI</span>
+              Qlab<span className="text-primary">AI</span>
             </Link>
           </div>
           <div className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} FilmCraftAI. All rights reserved.
+            &copy; {new Date().getFullYear()} QlabAI. All rights reserved.
           </div>
         </div>
       </div>

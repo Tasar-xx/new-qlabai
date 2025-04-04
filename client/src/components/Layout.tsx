@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="container mx-auto">
           <div className="flex justify-between items-center">
             <Link href="/" className="text-2xl font-bold">
-              FilmCraft<span className="text-primary">AI</span>
+              Qlab<span className="text-primary">AI</span>
             </Link>
             <Navigation />
             <MobileNavigation />
