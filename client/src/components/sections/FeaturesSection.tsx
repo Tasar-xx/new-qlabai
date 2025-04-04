@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { fadeIn, staggerContainer } from "@/lib/animation";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowRight, Camera, Code, Palette, MapPin, Film, User } from "lucide-react";
-import { useRef, useState, useEffect, ReactNode } from "react";
+import React, { useRef, useState, useEffect, ReactNode } from "react";
 
 // Import all feature images
 import feature1Img from '@/assets/features/feature-1.png';
@@ -132,6 +132,7 @@ const features: Feature[] = [
 export default function FeaturesSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const featuresContainerRef = useRef<HTMLDivElement | null>(null);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -157,7 +158,74 @@ export default function FeaturesSection() {
     };
   }, []);
 
-  // Handle scroll events to change the active feature
+  // Handle wheel events for floating windows navigation
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (!featuresContainerRef.current || isScrolling) return;
+      
+      // Check if the wheel event is within our container
+      if (featuresContainerRef.current.contains(e.target as Node)) {
+        e.preventDefault();
+        
+        // Determine scroll direction
+        const direction = e.deltaY > 0 ? 1 : -1;
+        
+        // Calculate new index with boundary checks
+        const newIndex = Math.max(0, Math.min(features.length - 1, activeFeatureIndex + direction));
+        
+        if (newIndex !== activeFeatureIndex) {
+          setIsScrolling(true);
+          setActiveFeatureIndex(newIndex);
+          setTimeout(() => setIsScrolling(false), 500);
+        }
+      }
+    };
+    
+    // Add keyboard navigation for accessibility
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!featuresContainerRef.current || isScrolling) return;
+      
+      // Only handle keyboard navigation when features container is in viewport
+      const rect = featuresContainerRef.current.getBoundingClientRect();
+      const isInViewport = 
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= window.innerHeight &&
+        rect.right <= window.innerWidth;
+        
+      if (isInViewport) {
+        // Handle arrow keys
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          const newIndex = Math.min(features.length - 1, activeFeatureIndex + 1);
+          if (newIndex !== activeFeatureIndex) {
+            setIsScrolling(true);
+            setActiveFeatureIndex(newIndex);
+            setTimeout(() => setIsScrolling(false), 500);
+          }
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const newIndex = Math.max(0, activeFeatureIndex - 1);
+          if (newIndex !== activeFeatureIndex) {
+            setIsScrolling(true);
+            setActiveFeatureIndex(newIndex);
+            setTimeout(() => setIsScrolling(false), 500);
+          }
+        }
+      }
+    };
+    
+    // Add event listeners with passive: false to allow preventDefault
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeFeatureIndex, isScrolling]);
+
+  // Handle normal scroll events to change the active feature
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current || isScrolling) return;
@@ -219,56 +287,129 @@ export default function FeaturesSection() {
           </motion.div>
 
           {/* Feature Display */}
-          <motion.div
-            key={activeFeatureIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className={`bg-gradient-radial ${currentFeature.color} backdrop-blur-md p-10 rounded-3xl border border-white/10 shadow-2xl mx-auto max-w-6xl`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="text-primary mb-6 bg-black/30 p-6 inline-block rounded-2xl">
-                  {currentFeature.icon}
-                </div>
-                <h3 className="text-4xl font-bold mb-3">{currentFeature.title}</h3>
-                <p className="text-primary text-xl mb-6">{currentFeature.description}</p>
-                <p className="text-lg text-gray-300 mb-8">{currentFeature.longDescription}</p>
-                
-                <div className="space-y-3 mb-8">
-                  <h4 className="text-xl font-semibold">Key Features:</h4>
-                  <ul className="space-y-2">
-                    {currentFeature.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <div className="mr-2 mt-1 bg-primary/20 p-1 rounded-full">
-                          <ArrowRight className="h-3 w-3 text-primary" />
-                        </div>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <Button
-                  variant="default"
-                  size="lg"
-                  className="rounded-full bg-primary text-black hover:bg-primary/90"
-                >
-                  Explore {currentFeature.title}
-                </Button>
-              </div>
+          <div 
+            ref={featuresContainerRef}
+            className="relative h-[600px] mx-auto overflow-visible mb-20">
+            {features.map((feature, index) => {
+              // Calculate position and z-index based on distance from active index
+              const distance = Math.abs(index - activeFeatureIndex);
+              const zIndex = features.length - distance;
               
-              <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden">
-                <img 
-                  src={currentFeature.image} 
-                  alt={`Demonstration of ${currentFeature.title} feature`}
-                  className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                  style={{ filter: currentFeature.filter }}
-                />
-              </div>
-            </div>
-          </motion.div>
+              // Calculate x position (left/right offset)
+              let xPosition = '0%';
+              let scale = 1;
+              let opacity = 1;
+              let isPointerEventsNone = false;
+              
+              if (index < activeFeatureIndex) {
+                // Left side cards
+                xPosition = `-${15 + (distance - 1) * 5}%`;
+                scale = 1 - 0.07 * distance;
+                opacity = 1 - 0.2 * distance;
+                if (distance > 2) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
+              } else if (index > activeFeatureIndex) {
+                // Right side cards
+                xPosition = `${15 + (distance - 1) * 5}%`;
+                scale = 1 - 0.07 * distance;
+                opacity = 1 - 0.2 * distance;
+                if (distance > 2) {
+                  opacity = 0;
+                  isPointerEventsNone = true;
+                }
+              }
+              
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: opacity, 
+                    y: 0,
+                    x: xPosition,
+                    scale: scale,
+                    zIndex: zIndex
+                  }}
+                  transition={{ 
+                    duration: 0.5,
+                    ease: "easeInOut"
+                  }}
+                  className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 h-[600px] overflow-y-auto`}
+                  style={{ 
+                    transformOrigin: index < activeFeatureIndex ? 'left center' : 'right center',
+                    pointerEvents: isPointerEventsNone ? 'none' : 'auto',
+                    cursor: index !== activeFeatureIndex ? 'pointer' : 'default'
+                  }}
+                  onClick={() => {
+                    if (index !== activeFeatureIndex) {
+                      setActiveFeatureIndex(index);
+                    }
+                  }}
+                  tabIndex={isPointerEventsNone ? -1 : 0}
+                  role="button"
+                  aria-label={`View ${feature.title} feature details`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (index !== activeFeatureIndex) {
+                        setActiveFeatureIndex(index);
+                      }
+                    }
+                  }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
+                    <div>
+                      <div className="text-primary mb-6 bg-black/30 p-6 inline-block rounded-2xl">
+                        {feature.icon}
+                      </div>
+                      <h3 className="text-4xl font-bold mb-3">{feature.title}</h3>
+                      <p className="text-primary text-xl mb-6">{feature.description}</p>
+                      
+                      {/* Only show detailed content for active feature */}
+                      {index === activeFeatureIndex && (
+                        <>
+                          <p className="text-lg text-gray-300 mb-8">{feature.longDescription}</p>
+                          
+                          <div className="space-y-3 mb-8">
+                            <h4 className="text-xl font-semibold">Key Features:</h4>
+                            <ul className="space-y-2">
+                              {feature.features.map((featureItem, idx) => (
+                                <li key={idx} className="flex items-start">
+                                  <div className="mr-2 mt-1 bg-primary/20 p-1 rounded-full">
+                                    <ArrowRight className="h-3 w-3 text-primary" />
+                                  </div>
+                                  <span>{featureItem}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          <Button
+                            variant="default"
+                            size="lg"
+                            className="rounded-full bg-primary text-black hover:bg-primary/90"
+                          >
+                            Explore {feature.title}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    
+                    <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden">
+                      <img 
+                        src={feature.image} 
+                        alt={`Demonstration of ${feature.title} feature`}
+                        className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                        style={{ filter: feature.filter }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
           
           {/* Feature Navigation */}
           <div className="flex justify-center mt-12 space-x-2">
@@ -277,15 +418,6 @@ export default function FeaturesSection() {
                 key={index}
                 onClick={() => {
                   setActiveFeatureIndex(index);
-                  if (sectionRef.current) {
-                    const sectionHeight = sectionRef.current.offsetHeight;
-                    const sectionTop = sectionRef.current.offsetTop;
-                    const scrollTarget = sectionTop + (sectionHeight / features.length) * (index + 0.5);
-                    window.scrollTo({
-                      top: scrollTarget,
-                      behavior: "smooth"
-                    });
-                  }
                 }}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${index === activeFeatureIndex ? 'bg-primary scale-125' : 'bg-gray-600 hover:bg-gray-400'}`}
                 aria-label={`View ${feature.title}`}
