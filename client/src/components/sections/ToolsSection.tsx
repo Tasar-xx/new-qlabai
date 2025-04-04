@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { fadeIn, staggerContainer, zoomIn } from "@/lib/animation";
 import { Camera, Film, Pencil, Volume2, Lightbulb, Wand2, Map, Palette, Shirt, Clapperboard, Users, LayoutGrid, Sparkles, FlipVertical, Languages } from "lucide-react";
 

@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { fadeIn, staggerContainer } from "@/lib/animation";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowRight, Camera, Code, Palette, MapPin, Film, User } from "lucide-react";
