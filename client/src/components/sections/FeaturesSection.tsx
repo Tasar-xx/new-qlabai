@@ -12,8 +12,18 @@ import feature4Img from '@/assets/features/feature-4.png';
 import feature5Img from '@/assets/features/feature-5.png';
 import feature6Img from '@/assets/features/feature-6.png';
 
-// Import feature video
-import featureVideo from '@/assets/videos/feature-video.mp4';
+// Import feature video (only for Concept Art tab)
+import conceptArtVideo from '@/assets/videos/feature-video.mp4';
+
+// Define video placeholder variables - these will be replaced with actual content later
+const videoPlaceholders = [
+  null, // Script Development - placeholder for now
+  conceptArtVideo, // Concept Art - using the provided video
+  null, // Look Development - placeholder for now
+  null, // Character Design - placeholder for now
+  null, // Location Scouting - placeholder for now
+  null, // Camera Lensing - placeholder for now
+];
 
 // Define feature interface
 interface Feature {
@@ -339,11 +349,12 @@ export default function FeaturesSection() {
                     duration: 0.5,
                     ease: "easeInOut"
                   }}
-                  className={`bg-gradient-radial ${feature.color} backdrop-blur-md p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 h-[600px] overflow-y-auto`}
+                  className={`bg-gradient-radial ${feature.color} p-6 md:p-10 rounded-3xl border border-white/10 shadow-2xl absolute w-full max-w-6xl left-0 right-0 mx-auto top-0 h-[600px] overflow-y-auto`}
                   style={{ 
                     transformOrigin: index < activeFeatureIndex ? 'left center' : 'right center',
                     pointerEvents: isPointerEventsNone ? 'none' : 'auto',
-                    cursor: index !== activeFeatureIndex ? 'pointer' : 'default'
+                    cursor: index !== activeFeatureIndex ? 'pointer' : 'default',
+                    backgroundColor: `rgba(0, 0, 0, ${index === activeFeatureIndex ? 0.7 : 0.4})`,
                   }}
                   onClick={() => {
                     if (index !== activeFeatureIndex) {
@@ -401,9 +412,9 @@ export default function FeaturesSection() {
                     </div>
                     
                     <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden w-[120%] mx-auto">
-                      {index === activeFeatureIndex ? (
+                      {index === activeFeatureIndex && videoPlaceholders[index] ? (
                         <video 
-                          src={featureVideo} 
+                          src={videoPlaceholders[index]} 
                           autoPlay 
                           loop 
                           muted 
@@ -412,12 +423,21 @@ export default function FeaturesSection() {
                           style={{ filter: feature.filter }}
                         />
                       ) : (
-                        <img 
-                          src={feature.image} 
-                          alt={`Demonstration of ${feature.title} feature`}
-                          className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
-                          style={{ filter: feature.filter }}
-                        />
+                        <div className="w-full h-full rounded-xl overflow-hidden relative">
+                          <img 
+                            src={feature.image} 
+                            alt={`Demonstration of ${feature.title} feature`}
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            style={{ filter: feature.filter }}
+                          />
+                          {index === activeFeatureIndex && !videoPlaceholders[index] && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <p className="text-white/80 text-sm font-medium">
+                                Video placeholder for {feature.title}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
