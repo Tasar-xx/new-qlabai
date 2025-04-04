@@ -219,10 +219,10 @@ const toolsSections = [
 ];
 
 export default function ToolsSection() {
-  const { ref, isVisible } = useIntersectionObserver();
+  const [isVisible, setIsVisible] = useState(false);
   const [activeToolIndex, setActiveToolIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
 
   // Function to handle scroll events within the tools section
   useEffect(() => {
@@ -261,19 +261,32 @@ export default function ToolsSection() {
 
   const currentTool = toolsSections[activeToolIndex];
 
-  // Create a callback ref that works with both refs
-  const combinedRef = (el: HTMLDivElement | null) => {
-    // Update the section ref
-    sectionRef.current = el;
-  };
+  // Add intersection observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+    
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
       id="tools"
-      ref={(el) => {
-        combinedRef(el);
-        if (typeof ref === 'function') ref(el);
-      }}
+      ref={sectionRef}
       className="min-h-screen py-24 bg-gradient-to-b from-black/90 to-black relative snap-start"
     >
       <div className="container mx-auto px-6">
