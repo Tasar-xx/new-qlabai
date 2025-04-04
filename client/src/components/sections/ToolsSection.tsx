@@ -252,40 +252,7 @@ export default function ToolsSection() {
   const [isScrolling, setIsScrolling] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Function to handle scroll events within the tools section
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const handleScroll = () => {
-      if (!sectionRef.current || isScrolling) return;
-
-      setIsScrolling(true);
-      setTimeout(() => setIsScrolling(false), 150);
-
-      const currentScrollPos = window.scrollY;
-      const sectionTop = sectionRef.current.offsetTop;
-      const sectionHeight = sectionRef.current.offsetHeight;
-      
-      // Calculate how far we've scrolled into the section
-      const scrolledIntoSection = currentScrollPos - sectionTop;
-      
-      // Calculate which tool should be active based on scroll position
-      if (scrolledIntoSection > 0) {
-        const toolHeight = sectionHeight / toolsSections.length;
-        const newIndex = Math.min(
-          Math.floor(scrolledIntoSection / toolHeight),
-          toolsSections.length - 1
-        );
-        
-        if (newIndex !== activeToolIndex) {
-          setActiveToolIndex(newIndex);
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isVisible, activeToolIndex, isScrolling]);
+  // No scroll event handling - tabs are changed only by clicking
 
   const currentTool = toolsSections[activeToolIndex];
 
@@ -490,9 +457,7 @@ export default function ToolsSection() {
           <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-primary/20 blur-3xl rounded-full" />
         </motion.div>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-400 animate-pulse">Scroll to explore more tools</p>
-        </div>
+
       </div>
     </section>
   );
