@@ -3,6 +3,7 @@ import { fadeIn, staggerContainer } from "@/lib/animation";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowRight, Camera, Code, Palette, MapPin, Film, User } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import featureShowcaseImg from '@/assets/feature-showcase.png';
 
 const features = [
   {
@@ -227,13 +228,12 @@ export default function FeaturesSection() {
                 </Button>
               </div>
               
-              <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5">
-                <div className="text-center text-gray-500">
-                  <div className="mb-4">
-                    <Camera className="h-16 w-16 mx-auto opacity-30" />
-                  </div>
-                  <p className="text-sm">Feature demonstration would appear here</p>
-                </div>
+              <div className="bg-black/40 rounded-2xl aspect-video flex items-center justify-center p-4 border border-white/5 overflow-hidden">
+                <img 
+                  src={featureShowcaseImg} 
+                  alt="Feature demonstration of filmmaking in action"
+                  className="w-full h-full object-cover rounded-xl transition-transform duration-500 hover:scale-105"
+                />
               </div>
             </div>
           </motion.div>
